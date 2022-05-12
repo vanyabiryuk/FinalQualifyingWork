@@ -16,6 +16,7 @@
 		1753DA762829940800F8A7BD /* ResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1753DA752829940800F8A7BD /* ResultViewController.swift */; };
 		177A1C1B282C2185002EBB7C /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177A1C1A282C2185002EBB7C /* ImageManager.swift */; };
 		177A1C1D282C23C1002EBB7C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177A1C1C282C23C1002EBB7C /* Constants.swift */; };
+		177A1C21282C71D5002EBB7C /* DataProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177A1C20282C71D5002EBB7C /* DataProcessing.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		1753DA752829940800F8A7BD /* ResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewController.swift; sourceTree = "<group>"; tabWidth = 4; };
 		177A1C1A282C2185002EBB7C /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		177A1C1C282C23C1002EBB7C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		177A1C20282C71D5002EBB7C /* DataProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProcessing.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 		1753DA742829715C00F8A7BD /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				177A1C20282C71D5002EBB7C /* DataProcessing.swift */,
 				177A1C1A282C2185002EBB7C /* ImageManager.swift */,
 				177A1C1C282C23C1002EBB7C /* Constants.swift */,
 			);
@@ -175,6 +178,7 @@
 				177A1C1B282C2185002EBB7C /* ImageManager.swift in Sources */,
 				172F67CA2822F182008D72C6 /* AppDelegate.swift in Sources */,
 				172F67CC2822F182008D72C6 /* SceneDelegate.swift in Sources */,
+				177A1C21282C71D5002EBB7C /* DataProcessing.swift in Sources */,
 				1753DA762829940800F8A7BD /* ResultViewController.swift in Sources */,
 				177A1C1D282C23C1002EBB7C /* Constants.swift in Sources */,
 			);

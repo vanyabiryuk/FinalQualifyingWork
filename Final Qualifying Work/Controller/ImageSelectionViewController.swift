@@ -45,7 +45,34 @@ class ImageSelectionViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.imageSelectionToResultSegue {
             let resultVC = segue.destination as! ResultViewController
-            resultVC.imageManager.imageDictionary[.original] = imageView.image
+            guard let originalImage = imageView.image else { return }
+            guard let cgImage = originalImage.cgImage else { return }
+            
+            // TODO: Make it user defined
+            let scale = 10.0
+            
+            let width = Int(Double(cgImage.width) / scale)
+            let height = Int(Double(cgImage.height) / scale)
+            let space = CGColorSpaceCreateDeviceRGB()
+            var bitmapInfo = CGBitmapInfo.alphaInfoMask.rawValue & CGImageAlphaInfo.premultipliedLast.rawValue
+            bitmapInfo |= CGBitmapInfo.byteOrder32Big.rawValue
+            
+            guard let cgContext = CGContext(data: nil,
+                                            width: width,
+                                            height: height,
+                                            bitsPerComponent: 8,
+                                            bytesPerRow: 0,
+                                            space: space,
+                                            bitmapInfo: bitmapInfo) else { return }
+            
+            let drawRectangle = CGRect(x: 0, y: 0, width: width, height: height)
+            cgContext.draw(cgImage, in: drawRectangle)
+            
+            guard let resizedCGImage = cgContext.makeImage() else { return }
+            resultVC.imageManager.imageDictionary[.original] = UIImage(cgImage: resizedCGImage,
+                                                                       scale: 1.0,
+                                                                       orientation: originalImage.imageOrientation)
+            
         }
     }
 }

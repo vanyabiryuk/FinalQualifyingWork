@@ -26,7 +26,9 @@ class ImageManager {
         
         switch filter {
         case .sobel:
-            print(filter.rawValue)
+            let sobelUIImage = sobel()
+            imageDictionary[.sobel] = sobelUIImage
+            return sobelUIImage
         case .scharr:
             print(filter.rawValue)
         case .canny:
@@ -80,5 +82,83 @@ class ImageManager {
         imageDictionary[.grayscale] = UIImage(cgImage: grayscaleCGImage,
                                               scale: 1.0,
                                               orientation: originalImage.imageOrientation)
+    }
+    
+    func grayscaleImageCGContext() -> CGContext? {
+        guard let gsImage = imageDictionary[.grayscale] ?? nil else {
+            print("Couldn't create grayscale image CGContext: grayscale image is nil.")
+            return nil
+        }
+        
+        guard let gsCGImage = gsImage.cgImage else {
+            print("Couldn't create grayscale image CGContext: grayscale CGImage is nil.")
+            return nil
+        }
+        
+        let width = gsCGImage.width
+        let height = gsCGImage.height
+        let bytesPerRow = width
+        let space = CGColorSpaceCreateDeviceGray()
+        let bitmapInfo = CGBitmapInfo.alphaInfoMask.rawValue & CGImageAlphaInfo.none.rawValue
+        
+        let data = UnsafeMutableRawPointer.allocate(byteCount: height * bytesPerRow, alignment: 1)
+        
+        guard let cgContext = CGContext(data: data,
+                                        width: width,
+                                        height: height,
+                                        bitsPerComponent: 8,
+                                        bytesPerRow: bytesPerRow,
+                                        space: space,
+                                        bitmapInfo: bitmapInfo) else {
+            print("Couldn't create grayscale image CGContext: CGContext is nil.")
+            return nil
+        }
+        
+        let drawRectangle = CGRect(x: 0, y: 0, width: width, height: height)
+        cgContext.draw(gsCGImage, in: drawRectangle)
+        
+        return cgContext
+    }
+    
+    func sobel() -> UIImage? {
+        guard let grayscaleImageCGContext = grayscaleImageCGContext() else { return nil }
+        let width = grayscaleImageCGContext.width
+        let height = grayscaleImageCGContext.height
+        
+        guard let dataUMRP = grayscaleImageCGContext.data else { return nil }
+        
+        let dataUMP = dataUMRP.bindMemory(to: UInt8.self, capacity: width * height)
+        let pixelData = UnsafeMutableBufferPointer<UInt8>(start: dataUMP, count: width * height)
+        
+        let brightness = newPaddedMatrix(pixelData, width, height, 1)
+        guard let magnitude = calculateMagnitude(brightness,
+                                                 width,
+                                                 height,
+                                                 K.sobelXKernel,
+                                                 K.sobelYKernel) else { return nil }
+        
+        for row in 0..<height {
+            for column in 0..<width {
+                pixelData[row * width + column] = UInt8(magnitude[row][column])
+            }
+        }
+        
+        let space = CGColorSpaceCreateDeviceGray()
+        let bitmapInfo = CGBitmapInfo.alphaInfoMask.rawValue & CGImageAlphaInfo.none.rawValue
+        
+        guard let sobelCGContext = CGContext(data: pixelData.baseAddress,
+                                             width: width,
+                                             height: height,
+                                             bitsPerComponent: 8,
+                                             bytesPerRow: width,
+                                             space: space,
+                                             bitmapInfo: bitmapInfo) else { return nil }
+        
+        guard let sobelCGImage = sobelCGContext.makeImage() else { return nil }
+        
+        let sobelUIImage = UIImage(cgImage: sobelCGImage)
+        pixelData.deallocate()
+        
+        return sobelUIImage
     }
 }

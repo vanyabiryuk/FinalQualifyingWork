@@ -17,6 +17,7 @@ class ResultViewController: UIViewController {
         super.viewDidLoad()
         imageManager.createGrayscaleImage()
         
+        pickerView(pickerView, didSelectRow: 0, inComponent: 0)
         pickerView.dataSource = self
         pickerView.delegate = self
     }
