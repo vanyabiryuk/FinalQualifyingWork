@@ -42,6 +42,6 @@ extension ResultViewController: UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let selectedFilter = Filter.allCases[row]
-        imageView.image = imageManager.getImage(for: selectedFilter)
+        imageView.image = imageManager.getImage(with: selectedFilter)
     }
 }

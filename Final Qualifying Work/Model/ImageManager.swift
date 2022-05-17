@@ -13,35 +13,17 @@ enum Filter: String, CaseIterable {
     case grayscale = "Grayscale Image"
     case sobel     = "Sobel Operator"
     case scharr    = "Scharr Operator"
-    case canny     = "Canny Edge Detector"
     case prewitt   = "Prewitt Operator"
+    case canny     = "Canny Edge Detector"
     case roberts   = "Roberts Cross Operator"
 }
 
 class ImageManager {
     var imageDictionary = [Filter: UIImage?]()
     
-    func getImage(for filter: Filter) -> UIImage? {
+    func getImage(with filter: Filter) -> UIImage? {
         if let image = imageDictionary[filter] { return image }
-        
-        switch filter {
-        case .sobel:
-            let sobelUIImage = sobel()
-            imageDictionary[.sobel] = sobelUIImage
-            return sobelUIImage
-        case .scharr:
-            print(filter.rawValue)
-        case .canny:
-            print(filter.rawValue)
-        case .prewitt:
-            print(filter.rawValue)
-        case .roberts:
-            print(filter.rawValue)
-        default:
-            print(filter.rawValue)
-        }
-        
-        return nil
+        return applyAlgorithm(with: filter)
     }
     
     func createGrayscaleImage() {
@@ -120,7 +102,8 @@ class ImageManager {
         return cgContext
     }
     
-    func sobel() -> UIImage? {
+    func applyAlgorithm(with filter: Filter) -> UIImage? {
+        
         guard let grayscaleImageCGContext = grayscaleImageCGContext() else { return nil }
         let width = grayscaleImageCGContext.width
         let height = grayscaleImageCGContext.height
@@ -129,36 +112,67 @@ class ImageManager {
         
         let dataUMP = dataUMRP.bindMemory(to: UInt8.self, capacity: width * height)
         let pixelData = UnsafeMutableBufferPointer<UInt8>(start: dataUMP, count: width * height)
+        defer {
+            pixelData.deallocate()
+        }
         
-        let brightness = newPaddedMatrix(pixelData, width, height, 1)
-        guard let magnitude = calculateMagnitude(brightness,
-                                                 width,
-                                                 height,
-                                                 K.sobelXKernel,
-                                                 K.sobelYKernel) else { return nil }
+        
+        let brightness = create2DArray(data: pixelData,
+                                       padding: 1,
+                                       columns: width,
+                                       rows: height)
+        
+        var magnitude: [[Double]]?
+        
+        switch filter {
+        case .sobel:
+            magnitude = getMagnitudeOdd(array: brightness,
+                                        columns: width,
+                                        rows: height,
+                                        xKernel: K.sobelXKernel,
+                                        yKernel: K.sobelYKernel)
+        case .scharr:
+            magnitude = getMagnitudeOdd(array: brightness,
+                                        columns: width,
+                                        rows: height,
+                                        xKernel: K.scharrXKernel,
+                                        yKernel: K.scharrYKernel)
+        case .prewitt:
+            magnitude = getMagnitudeOdd(array: brightness,
+                                        columns: width,
+                                        rows: height,
+                                        xKernel: K.prewittXKernel,
+                                        yKernel: K.prewittYKernel)
+        case .roberts:
+            magnitude = getRobertsCrossMagnitude(array: brightness,
+                                                 columns: width,
+                                                 rows: height)
+        default:
+            break
+        }
+        
+        guard let safeMagnitude = magnitude else { return nil }
         
         for row in 0..<height {
             for column in 0..<width {
-                pixelData[row * width + column] = UInt8(magnitude[row][column])
+                pixelData[row * width + column] = UInt8(safeMagnitude[row][column])
             }
         }
         
         let space = CGColorSpaceCreateDeviceGray()
         let bitmapInfo = CGBitmapInfo.alphaInfoMask.rawValue & CGImageAlphaInfo.none.rawValue
         
-        guard let sobelCGContext = CGContext(data: pixelData.baseAddress,
-                                             width: width,
-                                             height: height,
-                                             bitsPerComponent: 8,
-                                             bytesPerRow: width,
-                                             space: space,
-                                             bitmapInfo: bitmapInfo) else { return nil }
+        guard let cgContext = CGContext(data: pixelData.baseAddress,
+                                        width: width,
+                                        height: height,
+                                        bitsPerComponent: 8,
+                                        bytesPerRow: width,
+                                        space: space,
+                                        bitmapInfo: bitmapInfo) else { return nil }
         
-        guard let sobelCGImage = sobelCGContext.makeImage() else { return nil }
+        guard let cgImage = cgContext.makeImage() else { return nil }
+        guard let originalImage = imageDictionary[.original] ?? nil else { return nil }
         
-        let sobelUIImage = UIImage(cgImage: sobelCGImage)
-        pixelData.deallocate()
-        
-        return sobelUIImage
+        return UIImage(cgImage: cgImage, scale: 1.0, orientation: originalImage.imageOrientation)
     }
 }

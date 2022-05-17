@@ -16,6 +16,7 @@ class ImageSelectionViewController: UIViewController {
         super.viewDidLoad()
     }
     
+    /// Shows a view where user can select an image to filter.
     @IBAction func selectImageButtonPressed(_ sender: UIButton) {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
@@ -28,9 +29,14 @@ class ImageSelectionViewController: UIViewController {
         present(picker, animated: true)
     }
     
+    /// Checks if some image is selected.
+    /// If not, shows an alert.
+    /// If so, performs segue to the next screen.
     @IBAction func processButtonPressed(_ sender: UIButton) {
         guard imageView.image != nil else {
-            let alert = UIAlertController(title: "Select an Image", message: "You have to provide an image for algorithm to process", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Select an Image",
+                                          message: "You have to provide an image for algorithm to process",
+                                          preferredStyle: .alert)
             let action = UIAlertAction(title: "Cancel", style: .cancel)
             
             alert.addAction(action)
@@ -42,6 +48,7 @@ class ImageSelectionViewController: UIViewController {
         performSegue(withIdentifier: K.imageSelectionToResultSegue, sender: self)
     }
     
+    /// Prepares function to perform segue. Scales large images to increase computation speed and passes this image to the next ViewController.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.imageSelectionToResultSegue {
             let resultVC = segue.destination as! ResultViewController
@@ -72,12 +79,13 @@ class ImageSelectionViewController: UIViewController {
             resultVC.imageManager.imageDictionary[.original] = UIImage(cgImage: resizedCGImage,
                                                                        scale: 1.0,
                                                                        orientation: originalImage.imageOrientation)
-            
         }
     }
 }
 
 extension ImageSelectionViewController: PHPickerViewControllerDelegate {
+    
+    /// Dissmissing image picker and trying to cast returned results as UIImage
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         

@@ -65,7 +65,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Image Selection" largeTitleDisplayMode="never" id="mSl-wB-TMK">
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="gear" catalog="system" id="uNi-Kv-cAD"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="gear" catalog="system" id="uNi-Kv-cAD">
+                            <connections>
+                                <segue destination="ML4-xe-jvO" kind="presentation" id="Xy2-cv-A2J"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="imageView" destination="kNW-bl-a8e" id="gcd-Nn-47U"/>
@@ -76,6 +80,22 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1339.1304347826087" y="112.50000000000001"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="2Na-2C-ahR">
+            <objects>
+                <viewController id="ML4-xe-jvO" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="OUE-rO-lkG">
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="790"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="0PJ-eg-TCw"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="WdG-TG-RRV"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="92N-Gc-9z6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1338" y="876"/>
         </scene>
         <!--Result-->
         <scene sceneID="2Kt-5S-WJv">
@@ -109,11 +129,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Result" id="MeR-CF-CcL">
                         <rightBarButtonItems>
-                            <barButtonItem title="Item" image="crop" catalog="system" id="2pK-aU-jcD">
-                                <connections>
-                                    <segue destination="1fg-et-HlL" kind="show" id="Ana-sW-gCj"/>
-                                </connections>
-                            </barButtonItem>
+                            <barButtonItem title="Item" image="arrow.down.circle" catalog="system" id="2pK-aU-jcD"/>
                             <barButtonItem title="Inspect" image="info.circle" catalog="system" id="e0Q-yP-rgs">
                                 <connections>
                                     <segue destination="9HS-zh-9X2" kind="show" id="gpU-eK-mKM"/>
@@ -128,7 +144,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Nxy-dV-QCs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2313.04347826087" y="112.50000000000001"/>
+            <point key="canvasLocation" x="2188" y="112"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="XPS-rQ-9Ku">
@@ -144,23 +160,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6C6-by-bWP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3312" y="-289"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="C5g-bI-1VW">
-            <objects>
-                <viewController id="1fg-et-HlL" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="OYT-RB-BPJ">
-                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="IFK-Nk-quq"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="DxA-s6-Ucw"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Dev-QB-83Y" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3312" y="483"/>
+            <point key="canvasLocation" x="3080" y="112"/>
         </scene>
         <!--Item-->
         <scene sceneID="c3a-HY-uLV">
@@ -183,7 +183,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="crop" catalog="system" width="128" height="116"/>
+        <image name="arrow.down.circle" catalog="system" width="128" height="121"/>
         <image name="gear" catalog="system" width="128" height="119"/>
         <image name="info.circle" catalog="system" width="128" height="121"/>
         <systemColor name="systemBackgroundColor">
