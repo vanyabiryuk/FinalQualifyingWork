@@ -16,7 +16,6 @@ class ImageSelectionViewController: UIViewController {
         super.viewDidLoad()
     }
     
-    /// Shows a view where user can select an image to filter.
     @IBAction func selectImageButtonPressed(_ sender: UIButton) {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
@@ -29,9 +28,6 @@ class ImageSelectionViewController: UIViewController {
         present(picker, animated: true)
     }
     
-    /// Checks if some image is selected.
-    /// If not, shows an alert.
-    /// If so, performs segue to the next screen.
     @IBAction func processButtonPressed(_ sender: UIButton) {
         guard imageView.image != nil else {
             let alert = UIAlertController(title: "Select an Image",
@@ -48,7 +44,6 @@ class ImageSelectionViewController: UIViewController {
         performSegue(withIdentifier: K.imageSelectionToResultSegue, sender: self)
     }
     
-    /// Prepares function to perform segue. Scales large images to increase computation speed and passes this image to the next ViewController.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.imageSelectionToResultSegue {
             let resultVC = segue.destination as! ResultViewController
@@ -56,7 +51,7 @@ class ImageSelectionViewController: UIViewController {
             guard let cgImage = originalImage.cgImage else { return }
             
             // TODO: Make it user defined
-            let scale = 10.0
+            let scale = 2.0
             
             let width = Int(Double(cgImage.width) / scale)
             let height = Int(Double(cgImage.height) / scale)
@@ -84,8 +79,7 @@ class ImageSelectionViewController: UIViewController {
 }
 
 extension ImageSelectionViewController: PHPickerViewControllerDelegate {
-    
-    /// Dissmissing image picker and trying to cast returned results as UIImage
+
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         

@@ -8,16 +8,6 @@
 import Foundation
 import UIKit
 
-enum Filter: String, CaseIterable {
-    case original  = "Original Image"
-    case grayscale = "Grayscale Image"
-    case sobel     = "Sobel Operator"
-    case scharr    = "Scharr Operator"
-    case prewitt   = "Prewitt Operator"
-    case canny     = "Canny Edge Detector"
-    case roberts   = "Roberts Cross Operator"
-}
-
 class ImageManager {
     var imageDictionary = [Filter: UIImage?]()
     
@@ -116,57 +106,82 @@ class ImageManager {
             pixelData.deallocate()
         }
         
+        // TODO: create separately for different methods
         
-        let brightness = create2DArray(data: pixelData,
-                                       padding: 1,
-                                       columns: width,
-                                       rows: height)
+        let unsafeBrightness: [[Double]]?
         
-        var magnitude: [[Double]]?
+        switch filter {
+        case .sobel, .scharr, .prewitt, .roberts:
+            unsafeBrightness = create2DArray(data: pixelData,
+                                             width: width,
+                                             height: height)
+        case .canny:
+            unsafeBrightness = create2DArray(data: pixelData,
+                                             width: width,
+                                             height: height)
+        default:
+            unsafeBrightness = nil
+        }
+        
+        guard let brightness = unsafeBrightness else { return nil }
+        
+        let unsafeMagnitude: [[Double]]?
         
         switch filter {
         case .sobel:
-            magnitude = getMagnitudeOdd(array: brightness,
-                                        columns: width,
-                                        rows: height,
-                                        xKernel: K.sobelXKernel,
-                                        yKernel: K.sobelYKernel)
+            unsafeMagnitude = getMagnitudeOdd(array: brightness,
+                                              width: width,
+                                              height: height,
+                                              xKernel: K.sobelXKernel,
+                                              yKernel: K.sobelYKernel)
         case .scharr:
-            magnitude = getMagnitudeOdd(array: brightness,
-                                        columns: width,
-                                        rows: height,
-                                        xKernel: K.scharrXKernel,
-                                        yKernel: K.scharrYKernel)
+            unsafeMagnitude = getMagnitudeOdd(array: brightness,
+                                              width: width,
+                                              height: height,
+                                              xKernel: K.scharrXKernel,
+                                              yKernel: K.scharrYKernel)
         case .prewitt:
-            magnitude = getMagnitudeOdd(array: brightness,
-                                        columns: width,
-                                        rows: height,
-                                        xKernel: K.prewittXKernel,
-                                        yKernel: K.prewittYKernel)
+            unsafeMagnitude = getMagnitudeOdd(array: brightness,
+                                              width: width,
+                                              height: height,
+                                              xKernel: K.prewittXKernel,
+                                              yKernel: K.prewittYKernel)
         case .roberts:
-            magnitude = getRobertsCrossMagnitude(array: brightness,
-                                                 columns: width,
-                                                 rows: height)
+            unsafeMagnitude = getRobertsCrossMagnitude(array: brightness,
+                                                       width: width,
+                                                       height: height)
+        case .canny:
+            unsafeMagnitude = getCannyMagnitude(array: brightness,
+                                                width: width,
+                                                height: height)
         default:
-            break
+            unsafeMagnitude = nil
         }
         
-        guard let safeMagnitude = magnitude else { return nil }
+        guard let magnitude = unsafeMagnitude else { return nil }
         
-        for row in 0..<height {
-            for column in 0..<width {
-                pixelData[row * width + column] = UInt8(safeMagnitude[row][column])
+        let magnitudeHeight = magnitude.count
+        let magnitudeWidth = magnitude[0].count
+        
+        let newPixelData = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: magnitudeWidth * magnitudeHeight)
+        defer {
+            newPixelData.deallocate()
+        }
+        
+        for row in 0..<magnitudeHeight {
+            for column in 0..<magnitudeWidth {
+                newPixelData[row * magnitudeWidth + column] = UInt8(magnitude[row][column])
             }
         }
         
         let space = CGColorSpaceCreateDeviceGray()
         let bitmapInfo = CGBitmapInfo.alphaInfoMask.rawValue & CGImageAlphaInfo.none.rawValue
         
-        guard let cgContext = CGContext(data: pixelData.baseAddress,
-                                        width: width,
-                                        height: height,
+        guard let cgContext = CGContext(data: newPixelData.baseAddress,
+                                        width: magnitudeWidth,
+                                        height: magnitudeHeight,
                                         bitsPerComponent: 8,
-                                        bytesPerRow: width,
+                                        bytesPerRow: magnitudeWidth,
                                         space: space,
                                         bitmapInfo: bitmapInfo) else { return nil }
         
