@@ -10,8 +10,7 @@ import UIKit
 
 struct K {
     static let imageSelectionToResultSegue = "GoToResult"
-    static let deviceGrayscaleColorSpace = CGColorSpaceCreateDeviceGray()
-    
+    static let imageSelectionToSettingsSegue = "GoToSettings"
     
     // MARK: Kernels of Sobel's method
     
@@ -25,9 +24,9 @@ struct K {
     
     // MARK: Kernels of Scharr's method
     
-    static let scharrXKernel: [[Double]] = [[  3,   0,  -3],
-                                            [ 10,   0, -10],
-                                            [  3,   0,  -3]]
+    static let scharrXKernel: [[Double]] = [[ -3,   0,   3],
+                                            [-10,   0,  10],
+                                            [ -3,   0,   3]]
     
     static let scharrYKernel: [[Double]] = [[  3,  10,   3],
                                             [  0,   0,   0],
@@ -35,9 +34,9 @@ struct K {
     
     // MARK: Kernles of Prewitt's method
     
-    static let prewittXKernel: [[Double]] = [[ 1,  0, -1],
-                                             [ 1,  0, -1],
-                                             [ 1,  0, -1]]
+    static let prewittXKernel: [[Double]] = [[-1,  0,  1],
+                                             [-1,  0,  1],
+                                             [-1,  0,  1]]
     
     static let prewittYKernel: [[Double]] = [[ 1,  1,  1],
                                              [ 0,  0,  0],
