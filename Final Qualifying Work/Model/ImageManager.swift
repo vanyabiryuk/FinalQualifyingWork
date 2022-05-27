@@ -10,10 +10,18 @@ import UIKit
 
 class ImageManager {
     var imageDictionary = [Filter: UIImage?]()
+    var timeDictionary = [Filter: UInt64]()
     
     func getImage(with filter: Filter) -> UIImage? {
         if let image = imageDictionary[filter] { return image }
-        return applyAlgorithm(with: filter)
+        let results = applyAlgorithm(with: filter) ?? (nil, 0)
+        imageDictionary[filter] = results.image
+        timeDictionary[filter] = results.time / 1_000_000
+        return results.image
+    }
+    
+    func getTime(of filter: Filter) -> UInt64 {
+        return timeDictionary[filter] ?? 0
     }
     
     func createGrayscaleImage() {
@@ -54,6 +62,8 @@ class ImageManager {
         imageDictionary[.grayscale] = UIImage(cgImage: grayscaleCGImage,
                                               scale: 1.0,
                                               orientation: originalImage.imageOrientation)
+        timeDictionary[.original] = 0
+        timeDictionary[.grayscale] = 0
     }
     
     func grayscaleImageCGContext() -> CGContext? {
@@ -92,8 +102,8 @@ class ImageManager {
         return cgContext
     }
     
-    func applyAlgorithm(with filter: Filter) -> UIImage? {
-        
+    func applyAlgorithm(with filter: Filter) -> (image: UIImage?, time: UInt64)? {
+        let begin = DispatchTime.now()
         guard let grayscaleImageCGContext = grayscaleImageCGContext() else { return nil }
         let width = grayscaleImageCGContext.width
         let height = grayscaleImageCGContext.height
@@ -188,6 +198,9 @@ class ImageManager {
         guard let cgImage = cgContext.makeImage() else { return nil }
         guard let originalImage = imageDictionary[.original] ?? nil else { return nil }
         
-        return UIImage(cgImage: cgImage, scale: 1.0, orientation: originalImage.imageOrientation)
+        let newImage = UIImage(cgImage: cgImage, scale: 1.0, orientation: originalImage.imageOrientation)
+        let end = DispatchTime.now()
+        let time = end.uptimeNanoseconds - begin.uptimeNanoseconds
+        return (image: newImage, time: time)
     }
 }

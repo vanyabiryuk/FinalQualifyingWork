@@ -10,6 +10,7 @@ import UIKit
 class ResultViewController: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var pickerView: UIPickerView!
+    @IBOutlet weak var processLabel: UILabel!
     
     var imageManager = ImageManager()
     
@@ -21,6 +22,13 @@ class ResultViewController: UIViewController {
         pickerView.dataSource = self
         pickerView.delegate = self
     }
+    
+    @IBAction func downloadButtonPressed(_ sender: Any) {
+        guard let image = imageView.image else { return }
+        
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+    }
+    
 }
 
 // MARK: Picker view data source and delegate methods
@@ -43,5 +51,6 @@ extension ResultViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let selectedFilter = Filter.allCases[row]
         imageView.image = imageManager.getImage(with: selectedFilter)
+        processLabel.text = "Process took \(imageManager.getTime(of: selectedFilter)) ms"
     }
 }
